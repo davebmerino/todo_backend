@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 function generateTokenProvider(user) {
   const payload = {
-    sub: user._id.toString(),
+    sub: user["_id"],
     email: user.email,
     iat: Math.floor(Date.now() / 1000),
     expiration:

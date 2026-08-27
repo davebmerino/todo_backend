@@ -6,7 +6,7 @@ const morgan = require("morgan");
 const { StatusCodes } = require("http-status-codes");
 
 const responseFormatter = require("./middleware/responseFormatter.js");
-const expressWinstonLogger = require("./middleware/expresswinston.middleware.js");
+const expressWinstonLogger = require("./middleware/expressWinston.middleware.js");
 const taskRouter = require("./tasks/tasks.routes.js");
 const userRouter = require("./users/user.routes.js");
 const authRouter = require("./auth/auth.routes.js");
@@ -34,7 +34,11 @@ app.use("/api", authRouter);
 
 //404 NOT FOUND
 app.use((req, res) => {
-  res.status(StatusCodes.BAD_REQUEST).json(null);
+  res.status(StatusCodes.NOT_FOUND).json({
+    status: "error",
+    message: "Not Found",
+    error: null,
+  });
 });
 
 module.exports = app;
