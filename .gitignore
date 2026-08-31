@@ -2,3 +2,8 @@
 .env.development
 .env.production
 .env.local
+
+
+error.log
+access.log
+info.log
