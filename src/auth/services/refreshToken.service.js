@@ -8,9 +8,11 @@ const REFRESH_TOKEN_TTL = 30 * 24 * 60 * 60 * 1000;
 async function issueRefreshToken(res, userId) {
   const refreshToken = crypto.randomBytes(64).toString("hex");
 
-  await RefreshToken.create({
+  const tokenHash = hashToken(refreshToken);
+
+  const storedToken = await RefreshToken.create({
     user: userId,
-    tokenHash: hashToken(refreshToken),
+    tokenHash,
     expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
   });
 
@@ -21,6 +23,8 @@ async function issueRefreshToken(res, userId) {
     path: "/api/auth",
     maxAge: REFRESH_TOKEN_TTL,
   });
+
+  return storedToken;
 }
 
 function clearRefreshTokenCookie(res) {

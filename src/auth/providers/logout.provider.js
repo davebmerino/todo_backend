@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 
 const RefreshToken = require("../refreshToken.schema.js");
-const hashToken = require("../../../helpers/hashToken.helper.js");
+const hashToken = require("../../helpers/hashToken.helper.js");
 
 const {
   clearRefreshTokenCookie,

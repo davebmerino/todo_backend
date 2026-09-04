@@ -26,4 +26,6 @@ authRouter.post(
   authController.handleRefreshTokenController,
 );
 
+authRouter.post("/logout", authController.handleLogoutProvider);
+
 module.exports = authRouter;
