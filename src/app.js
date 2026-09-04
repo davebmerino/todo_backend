@@ -11,12 +11,9 @@ const expressWinstonLogger = require("./middleware/expressWinston.middleware.js"
 const taskRouter = require("./tasks/tasks.routes.js");
 const userRouter = require("./users/user.routes.js");
 const authRouter = require("./auth/auth.routes.js");
+const { apiLimiter } = require("./middleware/rateLimiters.js");
 
 const app = express();
-
-if (process.env.NODE_ENV === "production") {
-  app.set("trust proxy", 1);
-}
 
 app.use(express.json());
 app.use(cookieParser());
@@ -38,6 +35,8 @@ app.use(responseFormatter);
 app.use(expressWinstonLogger);
 
 // Applies a baseline limit to every /api endpoint
+app.set("trust proxy", 1);
+
 app.use("/api", apiLimiter);
 
 //Routes
