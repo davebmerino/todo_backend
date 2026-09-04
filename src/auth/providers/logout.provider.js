@@ -8,25 +8,23 @@ const {
 } = require("../services/refreshToken.service.js");
 
 async function logoutProvider(req, res) {
-  const refreshToken = req.cookies?.refreshToken;
+  const incomingToken = req.cookies?.refreshToken;
 
-  try {
-    if (refreshToken) {
-      await RefreshToken.deleteOne({
-        tokenHash: hashToken(refreshToken),
+  if (incomingToken) {
+    try {
+      const tokenHash = hashToken(incomingToken);
+      // Deletes only THIS session's token — not every session the user has
+      // open elsewhere. See note below if you want a "log out everywhere" too.
+      await RefreshToken.deleteOne({ tokenHash });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: "Unable to log out.",
       });
     }
-
-    clearRefreshTokenCookie(res);
-
-    return res.status(StatusCodes.OK).json({
-      message: "Logged out successfully.",
-    });
-  } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: "Unable to log out.",
-    });
   }
+  clearRefreshTokenCookie(res);
+
+  return res.status(StatusCodes.NO_CONTENT).end();
 }
 
 module.exports = logoutProvider;
