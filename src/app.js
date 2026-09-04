@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const fs = require("fs");
 const path = require("path");
 const morgan = require("morgan");
@@ -13,7 +14,12 @@ const authRouter = require("./auth/auth.routes.js");
 
 const app = express();
 
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 app.use(express.json());
+app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -31,10 +37,13 @@ app.use(morgan("combined", { stream: accessLogStream }));
 app.use(responseFormatter);
 app.use(expressWinstonLogger);
 
+// Applies a baseline limit to every /api endpoint
+app.use("/api", apiLimiter);
+
 //Routes
 app.use("/api/task", taskRouter);
 app.use("/api/user", userRouter);
-app.use("/api", authRouter);
+app.use("/api/auth", authRouter);
 
 //404 NOT FOUND
 app.use((req, res) => {

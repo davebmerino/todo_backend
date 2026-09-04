@@ -5,7 +5,7 @@ function generateTokenProvider(user) {
     sub: user["_id"],
     email: user.email,
     iat: Math.floor(Date.now() / 1000),
-    expiration:
+    exp:
       Math.floor(Date.now() / 1000) +
       parseInt(process.env.JWT_ACCESS_EXPIRATION_TTL),
   };
