@@ -21,6 +21,9 @@ taskRouter.get(
   taskController.handleFetchTask,
 );
 
+//Get Summary
+taskRouter.get("/summary", taskController.handleGetSummary);
+
 //Create task
 taskRouter.post(
   "/create",

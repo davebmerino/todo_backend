@@ -3,6 +3,7 @@ const createTaskProvider = require("./providers/createTask.provider.js");
 const getTaskProvider = require("./providers/getTask.provider.js");
 const deleteTaskProvider = require("./providers/deleteTask.provider.js");
 const updateTaskProvider = require("./providers/updateTask.provider.js");
+const getTaskSummaryProvider = require("./providers/getSummary.provider.js");
 
 async function handleFetchTask(req, res) {
   return await getTaskProvider(req, res);
@@ -20,9 +21,14 @@ async function handleDeleteTask(req, res) {
   return await deleteTaskProvider(req, res);
 }
 
+async function handleGetSummary(req, res) {
+  return await getTaskSummaryProvider(req, res);
+}
+
 module.exports = {
   handleCreateTask,
   handleDeleteTask,
   handleFetchTask,
   handleUpdateTask,
+  handleGetSummary,
 };

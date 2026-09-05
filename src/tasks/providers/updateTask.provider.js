@@ -6,25 +6,27 @@ const errorLogger = require("../../helpers/errorLogger.helper.js");
 async function updateTaskProvider(req, res) {
   const validatedResult = matchedData(req);
 
-  //
-  //const task = await Task.findById(req.body["_id"]);
-  // traditional na pag update
-  // task.title = req.body.title;
-  // task.description = req.body.description;
-  // task.status = req.body.status;
-  // task.priority = req.body.priority;
-  // task.dueDate = req.body.dueDate;
-  // return await task.save();
-
-  //
   try {
-    const task = await Task.findById(req.body["_id"]);
+    const task = await Task.findOne({
+      _id: validatedResult._id,
+      user: req.user.sub, // ownership check — without this, any user could edit any task by id
+    });
 
-    task.title = validatedResult.title || task.title;
-    task.description = validatedResult.description || task.description;
-    task.status = validatedResult.status || task.status;
-    task.priority = validatedResult.priority || task.priority;
-    task.dueDate = validatedResult.dueDate || task.dueDate;
+    if (!task) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ reason: "Task not found." });
+    }
+
+    // "??" instead of "||"— an intentionally-cleared falsy value (like an
+    // empty string) shouldn't silently fall back to the old value; only
+    // an actually-omitted (undefined) field should.
+
+    task.title = validatedResult.title ?? task.title;
+    task.description = validatedResult.description ?? task.description;
+    task.status = validatedResult.status ?? task.status;
+    task.priority = validatedResult.priority ?? task.priority;
+    task.dueDate = validatedResult.dueDate ?? task.dueDate;
 
     await task.save();
 
