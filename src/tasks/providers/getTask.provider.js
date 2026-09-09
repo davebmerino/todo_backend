@@ -17,7 +17,7 @@ async function getTaskProvider(req, res) {
     // Scope every query to the authenticated user — never trust a user id
     // from the client. Adjust `req.user.id` below if your authenticateToken
     // middleware attaches it under a different property.
-    const filter = { user: req.user.id };
+    const filter = { user: req.user.sub };
     if (data.status) filter.status = data.status;
     if (data.priority) filter.priority = data.priority;
     if (data.search) filter.title = { $regex: data.search, $options: "i" };
@@ -53,7 +53,7 @@ async function getTaskProvider(req, res) {
       },
     });
   } catch (error) {
-    errorLogger("Error while fetching", req, res);
+    errorLogger("Error while fetching", req, error);
     return res.status(StatusCodes.BAD_GATEWAY).json({
       reason: "Gateway timeout, please try again later",
     });
