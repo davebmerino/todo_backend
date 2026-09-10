@@ -4,15 +4,13 @@ const errorLogger = require("../../helpers/errorLogger.helper.js");
 
 const ACTIVE_STATUSES = ["todo", "inProgress"];
 
-const now = new Date();
-
 async function getTaskSummaryProvider(req, res) {
   const todayInManila = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Manila",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).format(now);
+  }).format(new Date());
 
   try {
     const userId = req.user.sub;
@@ -24,11 +22,13 @@ async function getTaskSummaryProvider(req, res) {
       startOfToday.getTime() + 24 * 60 * 60 * 1000,
     );
 
-    const startOfDayAfterTomorrow = new Date(startOfToday);
-    startOfDayAfterTomorrow.setDate(startOfDayAfterTomorrow.getDate() + 2);
+    const startOfDayAfterTomorrow = new Date(
+      startOfToday.getTime() + 2 * 24 * 60 * 60 * 1000,
+    );
 
-    const startOfNextSevenDays = new Date(startOfToday);
-    startOfNextSevenDays.setDate(startOfNextSevenDays.getDate() + 7);
+    const startOfNextSevenDays = new Date(
+      startOfToday.getTime() + 7 * 24 * 60 * 60 * 1000,
+    );
 
     // These are all independent of each other — run them concurrently
     // instead of awaiting one at a time, so the whole endpoint costs one
@@ -100,6 +100,7 @@ async function getTaskSummaryProvider(req, res) {
         dueTomorrow,
         dueNextSevenDays,
         completedCount,
+        totalCount,
         completionRate,
         recentTasks,
         upcomingDeadlines,
