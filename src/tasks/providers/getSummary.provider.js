@@ -6,25 +6,28 @@ const getDateKeyInTimezone = require("../../helpers/getDateKeyInTimezone.js");
 const ACTIVE_STATUSES = ["todo", "inProgress"];
 
 async function getTaskSummaryProvider(req, res) {
-  const addToday = getDateKeyInTimezone();
+  const todayKey = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 
   try {
     const userId = req.user.sub;
 
-    const startOfToday = new Date(`${addToday}T00:00:00+08:00`);
-    startOfToday.setHours(0, 0, 0, 0);
+    const startOfToday = new Date(`${todayKey}T00:00:00.000Z`);
 
-    const startOfTomorrow = new Date(
-      startOfToday.getTime() + 24 * 60 * 60 * 1000,
+    const startOfTomorrow = new Date(startOfToday);
+    startOfTomorrow.setUTCDate(startOfTomorrow.getUTCDate() + 1);
+
+    const startOfDayAfterTomorrow = new Date(startOfToday);
+    startOfDayAfterTomorrow.setUTCDate(
+      startOfDayAfterTomorrow.getUTCDate() + 2,
     );
 
-    const startOfDayAfterTomorrow = new Date(
-      startOfToday.getTime() + 2 * 24 * 60 * 60 * 1000,
-    );
-
-    const startOfNextSevenDays = new Date(
-      startOfToday.getTime() + 7 * 24 * 60 * 60 * 1000,
-    );
+    const startOfNextSevenDays = new Date(startOfToday);
+    startOfNextSevenDays.setUTCDate(startOfNextSevenDays.getUTCDate() + 7);
 
     // These are all independent of each other — run them concurrently
     // instead of awaiting one at a time, so the whole endpoint costs one
