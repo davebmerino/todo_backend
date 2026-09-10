@@ -4,15 +4,25 @@ const errorLogger = require("../../helpers/errorLogger.helper.js");
 
 const ACTIVE_STATUSES = ["todo", "inProgress"];
 
+const now = new Date();
+
 async function getTaskSummaryProvider(req, res) {
+  const todayInManila = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+
   try {
     const userId = req.user.sub;
 
-    const startOfToday = new Date();
+    const startOfToday = new Date(`${todayInManila}T00:00:00+08:00`);
     startOfToday.setHours(0, 0, 0, 0);
 
-    const startOfTomorrow = new Date(startOfToday);
-    startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+    const startOfTomorrow = new Date(
+      startOfToday.getTime() + 24 * 60 * 60 * 1000,
+    );
 
     const startOfDayAfterTomorrow = new Date(startOfToday);
     startOfDayAfterTomorrow.setDate(startOfDayAfterTomorrow.getDate() + 2);
@@ -25,6 +35,7 @@ async function getTaskSummaryProvider(req, res) {
     // round trip's worth of latency, not seven.
     const [
       dueToday,
+      pastDue,
       dueTomorrow,
       dueNextSevenDays,
       completedCount,
@@ -32,16 +43,33 @@ async function getTaskSummaryProvider(req, res) {
       recentTasks,
       upcomingDeadlines,
     ] = await Promise.all([
+      // Due today only
+      // Only tasks whose due date is today
       Task.countDocuments({
         user: userId,
         status: { $in: ACTIVE_STATUSES },
-        dueDate: { $gte: startOfToday, $lt: startOfTomorrow },
+        dueDate: {
+          $gte: startOfToday,
+          $lt: startOfTomorrow,
+        },
       }),
+      // Only unfinished tasks before today
+      Task.countDocuments({
+        user: userId,
+        status: { $in: ACTIVE_STATUSES },
+        dueDate: {
+          $lt: startOfToday,
+        },
+      }),
+
+      //Due tomorrow only
       Task.countDocuments({
         user: userId,
         status: { $in: ACTIVE_STATUSES },
         dueDate: { $gte: startOfTomorrow, $lt: startOfDayAfterTomorrow },
       }),
+
+      // Today through the next seven days
       Task.countDocuments({
         user: userId,
         status: { $in: ACTIVE_STATUSES },
@@ -68,6 +96,7 @@ async function getTaskSummaryProvider(req, res) {
     return res.status(StatusCodes.OK).json({
       data: {
         dueToday,
+        pastDue,
         dueTomorrow,
         dueNextSevenDays,
         completedCount,
