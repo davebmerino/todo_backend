@@ -1,21 +1,17 @@
 const { StatusCodes } = require("http-status-codes");
 const Task = require("../task.schema.js");
 const errorLogger = require("../../helpers/errorLogger.helper.js");
+const getDateKeyInTimezone = require("../../helpers/getDateKeyInTimezone.js");
 
 const ACTIVE_STATUSES = ["todo", "inProgress"];
 
 async function getTaskSummaryProvider(req, res) {
-  const todayInManila = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Manila",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
+  const addToday = getDateKeyInTimezone();
 
   try {
     const userId = req.user.sub;
 
-    const startOfToday = new Date(`${todayInManila}T00:00:00+08:00`);
+    const startOfToday = new Date(`${addToday}T00:00:00+08:00`);
     startOfToday.setHours(0, 0, 0, 0);
 
     const startOfTomorrow = new Date(
@@ -95,6 +91,7 @@ async function getTaskSummaryProvider(req, res) {
 
     return res.status(StatusCodes.OK).json({
       data: {
+        authenticatedUserId: userId,
         dueToday,
         pastDue,
         dueTomorrow,
