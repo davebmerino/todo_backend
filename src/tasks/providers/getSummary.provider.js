@@ -42,7 +42,6 @@ async function getTaskSummaryProvider(req, res) {
       recentTasks,
       upcomingDeadlines,
     ] = await Promise.all([
-      // Due today only
       // Only tasks whose due date is today
       Task.countDocuments({
         user: userId,
@@ -82,7 +81,7 @@ async function getTaskSummaryProvider(req, res) {
       Task.find({
         user: userId,
         status: { $in: ACTIVE_STATUSES },
-        dueDate: { $gte: startOfToday, $lt: startOfToday },
+        dueDate: { $gte: startOfToday, $lt: startOfTomorrow },
       })
         .sort({ updatedAt: -1 })
         .limit(5),
