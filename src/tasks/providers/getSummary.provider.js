@@ -79,14 +79,14 @@ async function getTaskSummaryProvider(req, res) {
       }),
       Task.countDocuments({ user: userId, status: "done" }),
       Task.countDocuments({ user: userId }),
-      Task.find({ user: userId }).sort({ updatedAt: -1 }).limit(10),
+      Task.find({ user: userId }).sort({ updatedAt: -1 }).limit(5),
       Task.find({
         user: userId,
         status: { $in: ACTIVE_STATUSES },
         dueDate: { $gte: startOfToday },
       })
         .sort({ dueDate: 1 })
-        .limit(10),
+        .limit(5),
     ]);
 
     const completionRate =
