@@ -20,7 +20,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: [
-      "https://todo-frontend-phi-sandy.vercel.app/",
+      "https://todo-frontend-phi-sandy.vercel.app",
       "http://localhost:5173/",
     ],
     credentials: true,
