@@ -15,14 +15,28 @@ const { apiLimiter } = require("./middleware/rateLimiters.js");
 
 const app = express();
 
+const allowedOrigins = [
+  "https://todo-frontend-phi-sandy.vercel.app",
+  "http://localhost:5173",
+];
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [
-      "https://todo-frontend-phi-sandy.vercel.app",
-      "http://localhost:5173/",
-    ],
+    origin(origin, callback) {
+      // Allow tools without a browser origin,
+      // such as Postman.
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`Origin not allowed: ${origin}`));
+    },
     credentials: true,
   }),
 );
