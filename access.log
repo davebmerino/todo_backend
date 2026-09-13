@@ -277,3 +277,4 @@
 ::1 - - [11/Sep/2026:13:31:10 +0000] "PATCH /api/task/update HTTP/1.1" 401 128 "-" "PostmanRuntime/7.56.1"
 ::1 - - [11/Sep/2026:13:31:45 +0000] "PATCH /api/task/update HTTP/1.1" 401 128 "-" "PostmanRuntime/7.56.1"
 ::1 - - [11/Sep/2026:13:32:11 +0000] "PATCH /api/task/update HTTP/1.1" 200 327 "-" "PostmanRuntime/7.56.1"
+::1 - - [13/Sep/2026:02:31:09 +0000] "POST /api/user/register HTTP/1.1" 201 143 "-" "PostmanRuntime/7.56.1"
